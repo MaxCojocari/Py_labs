@@ -15,7 +15,7 @@ RECOVERED = "Total Recovered"
 
 # change the directory path in according to the location
 # of the entire project
-path_file = '/content/drive/MyDrive/PBL_sem2/ohuinea.txt'
+path_file = 'data.txt'
 
 
 @st.cache(allow_output_mutation=True)
