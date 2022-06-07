@@ -15,7 +15,7 @@ RECOVERED = "Total Recovered"
 
 # change the directory path in according to the location
 # of the entire project
-path_file = 'data.txt'
+path_file = "file.txt"
 
 
 @st.cache(allow_output_mutation=True)
@@ -48,8 +48,11 @@ def make_forecast(selection, df, start_date, fh_interval):
         order=(2, 1, 2), seasonal_order=(1, 0, 1, 7), suppress_warnings=True
     )
 
+    # Data used for fh feeding
+    df_fit = df[df.index.to_timestamp() < datetime.strptime(str(start_date), "%Y-%m-%d")]
+
     # Fit chosen forecaster with train data
-    forecaster.fit(df)
+    forecaster.fit(df_fit)
 
     # Code for confidence interval prediction
     alpha = 0.05  
@@ -59,6 +62,13 @@ def make_forecast(selection, df, start_date, fh_interval):
     # Trace creation
     fig = go.Figure()
 
+    fig.add_trace(go.Scatter(x=new_pd.index.strftime('%Y-%m-%d'),
+                             y=new_pd.values,
+                             fill='toself',
+                             fillcolor='rgba(255, 102, 0, 0.2)',
+                             line_color='rgba(255 , 255, 255, 0)',
+                             showlegend=True,
+                             name='confidence interval'))
     fig.add_trace(go.Scatter(x=df.index.strftime('%Y-%m-%d'), 
                              y=df.values, 
                              line_color='rgb(0, 64, 255)',
@@ -69,13 +79,6 @@ def make_forecast(selection, df, start_date, fh_interval):
                              line_color='rgb(255, 102, 0)',
                              mode='lines+markers', 
                              name='prediction'))
-    fig.add_trace(go.Scatter(x=new_pd.index.strftime('%Y-%m-%d'),
-                             y=new_pd.values,
-                             fill='toself',
-                             fillcolor='rgba(255, 102, 0, 0.2)',
-                             line_color='rgba(255 , 255, 255, 0)',
-                             showlegend=True,
-                             name='confidence interval'))
     fig.update_layout(title=title,
                       xaxis_title="Date",
                       yaxis_title=y_label)
